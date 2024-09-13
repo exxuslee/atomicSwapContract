@@ -1,6 +1,8 @@
+// SPDX-License-Identifier: GPL-3.0
+// https://bscscan.com/address/0xac98e7242f8aa005f44accd6baeed1ff5af6824e
+
 pragma solidity ^0.8.1;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DextradeAtomicSwap {
@@ -45,7 +47,7 @@ contract DextradeAtomicSwap {
     modifier ensureAllowance(address token, address owner, uint256 amount) {
         require(amount > 0, "Amount must be greater than 0");
         if (token != address(0)) {
-            require(ERC20(token).allowance(owner, address(this)) >= amount, "Allowance must be greater than 0");
+            require(IERC20(token).allowance(owner, address(this)) >= amount, "Allowance must be greater than 0");
         }
         _;
     }
@@ -62,8 +64,8 @@ contract DextradeAtomicSwap {
         _;
     }
 
-    modifier validHashLock(bytes32 swapId, bytes32 hashLock) {
-        require(swaps[swapId].hashLock == keccak256(abi.encodePacked(hashLock)), "Incorrect hash lock");
+    modifier validHashLock(bytes32 swapId, bytes32 password) {
+        require(swaps[swapId].hashLock == sha256(abi.encodePacked(password)), "Incorrect password");
         _;
     }
 
@@ -87,12 +89,12 @@ contract DextradeAtomicSwap {
         address tokenAddress,
         uint256 amount
     )
-    public
+    external
     payable
     ensureAllowance(tokenAddress, msg.sender, amount)
     returns (bytes32 swapId)
     {
-        swapId = keccak256(
+        swapId = sha256(
             abi.encodePacked(
                 msg.sender,
                 recipient,
@@ -131,34 +133,33 @@ contract DextradeAtomicSwap {
         );
     }
 
-
     function reserve(uint256 amount, address tokenAddress) private {
         if (tokenAddress == address(0)) {
             require(amount == msg.value, "Amount must match with value");
         } else {
-            require(ERC20(tokenAddress).transferFrom(msg.sender, address(this), amount), "Transfer failed");
+            require(IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount), "Transfer failed");
         }
     }
 
-    function swapWidthdraw(SwapDetails storage swap, address payable widthdrawalAddress) private {
+
+    function swapWidthdraw(SwapDetails storage swap, address payable withdrawalAddress) private {
         if (swap.tokenAddress == address(0)) {
-            widthdrawalAddress.transfer(swap.amount);
+            withdrawalAddress.transfer(swap.amount);
         } else {
-            ERC20(swap.tokenAddress).transfer(widthdrawalAddress, swap.amount);
+            IERC20(swap.tokenAddress).transfer(withdrawalAddress, swap.amount);
         }
     }
 
 
-    function claimSwap(bytes32 swapId, bytes32 hashLock)
-    public
-    payable
+    function claimSwap(bytes32 swapId, bytes32 password)
+    external
     canClaim(swapId)
-    validHashLock(swapId, hashLock)
+    validHashLock(swapId, password)
     swapExists(swapId)
     returns (bool)
     {
         SwapDetails storage swap = swaps[swapId];
-        swap.hashLock = hashLock;
+        swap.hashLock = password;
         swap.claimed = true;
         swapWidthdraw(swap, payable(swap.recipient));
         emit SwapClaimed(swapId);
@@ -187,7 +188,6 @@ contract DextradeAtomicSwap {
     }
 
     function withdrawToken(address tokenContract, uint256 amount) external ensureOwner {
-        ERC20(tokenContract).transfer(msg.sender, amount);
+        IERC20(tokenContract).transfer(msg.sender, amount);
     }
 }
-
