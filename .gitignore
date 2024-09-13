@@ -1,10 +1,31 @@
-*.iml
-.gradle
-.idea
-.DS_Store
-/**/build/*
-/captures
-/local.properties
-.externalNativeBuild
-/app/release/app-release.aab
-/app/release/output-metadata.json
+# Logs
+logs
+*.log
+
+# Diagnostic reports (https://nodejs.org/api/report.html)
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Compiled binary addons (https://nodejs.org/api/addons.html)
+build/Release
+
+# Dependency directories
+node_modules/
+daemon/
+.idea/
+
+src/gmail/*.json
+
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+.env.local
