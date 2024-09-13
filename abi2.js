@@ -219,8 +219,7 @@ export const ATOMIC_SWAP_ABI = [
   {
     inputs: [
       {
-
-internalType: 'uint256',
+        internalType: 'uint256',
         name: 'amount',
         type: 'uint256',
       },
