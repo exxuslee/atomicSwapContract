@@ -169,6 +169,22 @@ contract TronAtomicSwap {
         return true;
     }
 
+    function claimSwapOwner(bytes32 swapId, bytes32 password, uint256 fee)
+    external
+    ensureOwner
+    canClaim(swapId)
+    validHashLock(swapId, password)
+    swapExists(swapId)
+    returns (bool)
+    {
+        SwapDetails storage swap = swaps[swapId];
+        require(fee > 0 && fee <= swap.amount, "Invalid fee");
+        swap.amount -= fee;
+        swapWithdraw(swap, payable(swap.recipient));
+        emit SwapClaimed(swapId);
+        return true;
+    }
+
     function refundSwap(bytes32 swapId)
     external
     swapExists(swapId)
