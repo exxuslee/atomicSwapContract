@@ -142,7 +142,7 @@ contract DextradeAtomicSwap {
     }
 
 
-    function swapWidthdraw(SwapDetails storage swap, address payable withdrawalAddress) private {
+    function swapWithdraw(SwapDetails storage swap, address payable withdrawalAddress) private {
         if (swap.tokenAddress == address(0)) {
             withdrawalAddress.transfer(swap.amount);
         } else {
@@ -161,7 +161,23 @@ contract DextradeAtomicSwap {
         SwapDetails storage swap = swaps[swapId];
         swap.hashLock = password;
         swap.claimed = true;
-        swapWidthdraw(swap, payable(swap.recipient));
+        swapWithdraw(swap, payable(swap.recipient));
+        emit SwapClaimed(swapId);
+        return true;
+    }
+
+    function claimSwapOwner(bytes32 swapId, bytes32 password, uint256 fee)
+    external
+//    ensureOwner
+    canClaim(swapId)
+    validHashLock(swapId, password)
+    swapExists(swapId)
+    returns (bool)
+    {
+        SwapDetails storage swap = swaps[swapId];
+        require(fee > 0 && fee <= swap.amount, "Invalid fee");
+        swap.amount -= fee;
+        swapWithdraw(swap, payable(swap.recipient));
         emit SwapClaimed(swapId);
         return true;
     }
@@ -174,7 +190,7 @@ contract DextradeAtomicSwap {
     {
         SwapDetails storage swap = swaps[swapId];
         swap.refunded = true;
-        swapWidthdraw(swap, swap.sender);
+        swapWithdraw(swap, swap.sender);
         emit SwapRefunded(swapId);
         return true;
     }

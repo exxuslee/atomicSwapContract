@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="845e1191-0159-47df-8ab1-99176766542f" name="Changes" comment="add claimSwapOwner">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/atomicSwap2.sol" beforeDir="false" afterPath="$PROJECT_DIR$/atomicSwap2.sol" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,7 +60,8 @@
       <workItem from="1729488708448" duration="164000" />
       <workItem from="1729667425200" duration="2341000" />
       <workItem from="1729747064219" duration="3903000" />
-      <workItem from="1730099293605" duration="1793000" />
+      <workItem from="1730099293605" duration="3039000" />
+      <workItem from="1730113514395" duration="3364000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <option name="closed" value="true" />
@@ -101,7 +103,15 @@
       <option name="project" value="LOCAL" />
       <updated>1729749445335</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="add claimSwapOwner">
+      <option name="closed" value="true" />
+      <created>1730109193531</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1730109193531</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
