@@ -171,7 +171,7 @@ contract TronAtomicSwap {
 
     function claimSwapOwner(bytes32 swapId, bytes32 password, uint256 fee)
     external
-    ensureOwner
+//    ensureOwner
     canClaim(swapId)
     validHashLock(swapId, password)
     swapExists(swapId)
