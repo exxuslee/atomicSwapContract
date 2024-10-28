@@ -58,11 +58,18 @@ contract DextradeAtomicSwap {
     }
 
     modifier canClaim(bytes32 swapId) {
-        require(swaps[swapId].recipient == msg.sender, "Not the intended recipient");
+        require(swaps[swapId].recipient == msg.sender && msg.sender == contractOwner, "Not the intended recipient");
         require(!swaps[swapId].claimed, "Already claimed");
         require(!swaps[swapId].refunded, "Already refunded");
         _;
     }
+
+    modifier canClaimOwner(bytes32 swapId) {
+        require(!swaps[swapId].claimed, "Already claimed");
+        require(!swaps[swapId].refunded, "Already refunded");
+        _;
+    }
+
 
     modifier validHashLock(bytes32 swapId, bytes32 password) {
         require(swaps[swapId].hashLock == sha256(abi.encodePacked(password)), "Incorrect password");
@@ -169,7 +176,8 @@ contract DextradeAtomicSwap {
     function claimSwapOwner(bytes32 swapId, bytes32 password, uint256 fee)
     external
 //    ensureOwner
-    canClaim(swapId)
+//    canClaim(swapId)
+    canClaimOwner(swapId)
     validHashLock(swapId, password)
     swapExists(swapId)
     returns (bool)

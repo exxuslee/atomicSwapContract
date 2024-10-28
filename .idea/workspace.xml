@@ -61,7 +61,8 @@
       <workItem from="1729667425200" duration="2341000" />
       <workItem from="1729747064219" duration="3903000" />
       <workItem from="1730099293605" duration="3039000" />
-      <workItem from="1730113514395" duration="3364000" />
+      <workItem from="1730113514395" duration="3707000" />
+      <workItem from="1730122489285" duration="1299000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <option name="closed" value="true" />
@@ -111,7 +112,15 @@
       <option name="project" value="LOCAL" />
       <updated>1730109193531</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="add claimSwapOwner">
+      <option name="closed" value="true" />
+      <created>1730120671273</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1730120671273</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
