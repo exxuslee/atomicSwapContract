@@ -22,7 +22,7 @@ contract DextradeAtomicSwap {
     struct AccumulatedFees {
         mapping(address => uint256) totalFees;
     }
-    AccumulatedFees public accumulatedFees;
+    AccumulatedFees private accumulatedFees;
 
     mapping(address => mapping(address => uint256)) private allowances;
     mapping(bytes32 => SwapDetails) public swaps;
@@ -153,6 +153,9 @@ contract DextradeAtomicSwap {
         }
     }
 
+    function getAccumulatedFees(address token) external view returns (uint256) {
+        return accumulatedFees.totalFees[token];
+    }
 
     function swapWithdraw(SwapDetails storage swap, address payable withdrawalAddress) private {
         if (swap.tokenAddress == address(0)) {
