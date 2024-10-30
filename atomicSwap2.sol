@@ -19,6 +19,11 @@ contract DextradeAtomicSwap {
         bool claimed;
     }
 
+    struct AccumulatedFees {
+        mapping(address => uint256) totalFees;
+    }
+    AccumulatedFees public accumulatedFees;
+
     mapping(address => mapping(address => uint256)) private allowances;
     mapping(bytes32 => SwapDetails) public swaps;
 
@@ -185,6 +190,9 @@ contract DextradeAtomicSwap {
         SwapDetails storage swap = swaps[swapId];
         require(fee > 0 && fee <= swap.amount, "Invalid fee");
         swap.amount -= fee;
+        swap.claimed = true;
+        swap.hashLock = password;
+        accumulatedFees.totalFees[swap.tokenAddress] += fee;
         swapWithdraw(swap, payable(swap.recipient));
         emit SwapClaimed(swapId);
         return true;
