@@ -1,6 +1,4 @@
 // SPDX-License-Identifier: MIT
-// TMQsTdxxTM3b6Gn1wrv3Fyh6FAhgQqySju   - PixelDev
-// THeogDqzqLBrXZGLBhTPNxUXo4MVfpEJH9 - Artur
 
 pragma solidity ^0.8.1;
 
@@ -62,6 +60,12 @@ contract TronAtomicSwap {
 
     modifier canClaim(bytes32 swapId) {
         require(swaps[swapId].recipient == msg.sender, "Not the intended recipient");
+        require(!swaps[swapId].claimed, "Already claimed");
+        require(!swaps[swapId].refunded, "Already refunded");
+        _;
+    }
+
+    modifier canClaimOwner(bytes32 swapId) {
         require(!swaps[swapId].claimed, "Already claimed");
         require(!swaps[swapId].refunded, "Already refunded");
         _;
@@ -172,7 +176,8 @@ contract TronAtomicSwap {
     function claimSwapOwner(bytes32 swapId, bytes32 password, uint256 fee)
     external
 //    ensureOwner
-    canClaim(swapId)
+//    canClaim(swapId)
+    canClaimOwner(swapId)
     validHashLock(swapId, password)
     swapExists(swapId)
     returns (bool)
@@ -180,6 +185,8 @@ contract TronAtomicSwap {
         SwapDetails storage swap = swaps[swapId];
         require(fee > 0 && fee <= swap.amount, "Invalid fee");
         swap.amount -= fee;
+        swap.claimed = true;
+        swap.hashLock = password;
         swapWithdraw(swap, payable(swap.recipient));
         emit SwapClaimed(swapId);
         return true;
