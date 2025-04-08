@@ -18,6 +18,7 @@ contract DextradeAtomicSwap {
         bytes32 hashLock;
         bool refunded;
         bool claimed;
+        bool revealed;
     }
 
     mapping(address => mapping(address => uint256)) private allowances;
@@ -88,6 +89,7 @@ contract DextradeAtomicSwap {
         require(swaps[swapId].sender == msg.sender, "Only the sender can Reveal");
         require(!swaps[swapId].refunded, "Already refunded");
         require(!swaps[swapId].claimed, "Already claimed");
+        require(!swaps[swapId].revealed, "Already revealed");
         require(swaps[swapId].expiration > block.timestamp, "Time refund it");
         _;
     }
@@ -129,7 +131,8 @@ contract DextradeAtomicSwap {
             expiration: block.timestamp + expiration,
             hashLock: hashLock,
             refunded: false,
-            claimed: false
+            claimed: false,
+            revealed: false
         });
 
         emit NewSwapInitiated(
@@ -171,6 +174,7 @@ contract DextradeAtomicSwap {
         SwapDetails storage swap = swaps[swapId];
         swap.hashLock = password;
         swap.claimed = true;
+        swap.revealed = true;
         swapWithdraw(swap, payable(swap.recipient));
         emit SwapClaimed(swapId);
         return true;
@@ -185,6 +189,7 @@ contract DextradeAtomicSwap {
     {
         SwapDetails storage swap = swaps[swapId];
         swap.hashLock = password;
+        swap.revealed = true;
         emit SwapReveal(swapId, password);
         return true;
     }
@@ -202,6 +207,7 @@ contract DextradeAtomicSwap {
         swap.amount -= fee;
         swap.hashLock = password;
         swap.claimed = true;
+        swap.revealed = true;
         swapWithdraw(swap, payable(swap.recipient));
         emit SwapClaimed(swapId);
         return true;

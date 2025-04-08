@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="845e1191-0159-47df-8ab1-99176766542f" name="Changes" comment="add claimSwapOwner">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="845e1191-0159-47df-8ab1-99176766542f" name="Changes" comment="add Reactive" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -21,12 +19,12 @@
     &quot;assignee&quot;: &quot;exxuslee&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/exxuslee/atomicSwapContract.git&quot;,
-    &quot;accountId&quot;: &quot;6eefb0f2-6634-4322-a14c-e38e1e5f511c&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/exxuslee/atomicSwapContract.git",
+    "accountId": "21d32289-5af2-4848-a685-b85e98ef8388"
   }
-}</component>
+}]]></component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -57,13 +55,15 @@
 }</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\git\crypto\contract\atomicSwap" />
       <recent name="D:\PRO\dex-contract" />
     </key>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-WS-243.22562.112" />
+        <option value="bundled-jdk-9823dce3aa75-fdfe4dae3a2d-intellij.indexing.shared.core-IU-243.22562.145" />
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-IU-243.22562.145" />
       </set>
     </attachedChunks>
   </component>
@@ -95,6 +95,7 @@
       <workItem from="1741009170227" duration="1798000" />
       <workItem from="1741697848570" duration="29000" />
       <workItem from="1744033228944" duration="720000" />
+      <workItem from="1744110018894" duration="4794000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <option name="closed" value="true" />
@@ -208,7 +209,39 @@
       <option name="project" value="LOCAL" />
       <updated>1731570794679</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="add Reactive">
+      <option name="closed" value="true" />
+      <created>1744113208521</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1744113208521</updated>
+    </task>
+    <task id="LOCAL-00016" summary="add Reactive">
+      <option name="closed" value="true" />
+      <created>1744113954276</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1744113954276</updated>
+    </task>
+    <task id="LOCAL-00017" summary="add Reactive">
+      <option name="closed" value="true" />
+      <created>1744114081129</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1744114081129</updated>
+    </task>
+    <task id="LOCAL-00018" summary="add Reactive">
+      <option name="closed" value="true" />
+      <created>1744114831831</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1744114831831</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -242,6 +275,7 @@
     <MESSAGE value="add sha256" />
     <MESSAGE value="update" />
     <MESSAGE value="add claimSwapOwner" />
-    <option name="LAST_COMMIT_MESSAGE" value="add claimSwapOwner" />
+    <MESSAGE value="add Reactive" />
+    <option name="LAST_COMMIT_MESSAGE" value="add Reactive" />
   </component>
 </project>
