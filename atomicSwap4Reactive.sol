@@ -89,7 +89,7 @@ contract DextradeAtomicSwap {
         require(swaps[swapId].sender == msg.sender, "Only the sender can Reveal");
         require(!swaps[swapId].refunded, "Already refunded");
         require(!swaps[swapId].claimed, "Already claimed");
-        require(swaps[swapId].expiration >= block.timestamp, "Time refund it");
+        require(swaps[swapId].expiration > block.timestamp, "Time refund it");
         _;
     }
 
