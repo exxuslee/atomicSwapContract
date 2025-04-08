@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GPL-3.0
-// https://bscscan.com/address/0xac98e7242f8aa005f44accd6baeed1ff5af6824e
+// https://sepolia.etherscan.io/address/0xa19f4f9459f643520aa92fcfc3cd35f193f311dc
 
 pragma solidity ^0.8.1;
 
-import {DextradeAtomicSwap} from "./atomicSwap1.sol";
-import {DextradeAtomicSwap} from "./atomicSwap2.sol";
-import {DextradeAtomicSwap} from "./atomicSwap3.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DextradeAtomicSwap {
     address private contractOwner;
