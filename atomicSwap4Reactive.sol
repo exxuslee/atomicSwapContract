@@ -3,7 +3,9 @@
 
 pragma solidity ^0.8.1;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {DextradeAtomicSwap} from "./atomicSwap1.sol";
+import {DextradeAtomicSwap} from "./atomicSwap2.sol";
+import {DextradeAtomicSwap} from "./atomicSwap3.sol";
 
 contract DextradeAtomicSwap {
     address private contractOwner;
@@ -33,7 +35,7 @@ contract DextradeAtomicSwap {
     );
     event SwapClaimed(bytes32 swapId);
     event SwapRefunded(bytes32 swapId);
-    event SwapReveal(bytes32 swapId);
+    event SwapReveal(bytes32 swapId, bytes32 secret);
 
     constructor() {
         contractOwner = msg.sender;
@@ -59,12 +61,6 @@ contract DextradeAtomicSwap {
 
     modifier canClaim(bytes32 swapId) {
 //        require(swaps[swapId].recipient == msg.sender, "Not the intended recipient");
-        require(!swaps[swapId].claimed, "Already claimed");
-        require(!swaps[swapId].refunded, "Already refunded");
-        _;
-    }
-
-    modifier canClaimOwner(bytes32 swapId) {
         require(!swaps[swapId].claimed, "Already claimed");
         require(!swaps[swapId].refunded, "Already refunded");
         _;
@@ -190,7 +186,7 @@ contract DextradeAtomicSwap {
     {
         SwapDetails storage swap = swaps[swapId];
         swap.hashLock = password;
-        emit SwapReveal(swapId);
+        emit SwapReveal(swapId, password);
         return true;
     }
 
@@ -198,14 +194,15 @@ contract DextradeAtomicSwap {
     external
 //    ensureOwner
     canClaim(swapId)
-    canClaimOwner(swapId)
     validHashLock(swapId, password)
     swapExists(swapId)
     returns (bool)
     {
         SwapDetails storage swap = swaps[swapId];
-        require(fee > 0 && fee <= swap.amount, "Invalid fee");
+        require(fee > 0 && fee < swap.amount, "Invalid fee");
         swap.amount -= fee;
+        swap.hashLock = password;
+        swap.claimed = true;
         swapWithdraw(swap, payable(swap.recipient));
         emit SwapClaimed(swapId);
         return true;
