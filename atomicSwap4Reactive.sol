@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
+//  https://kopli.reactscan.net/address/0x6f1c4b2bd0489e32af741c405cca696e8a95ce9c/contract/0xa19f4f9459f643520aa92fcfc3cd35f193f311dc
 pragma solidity ^0.8.20;
 
-import 'lib/reactive-lib/src/abstract-base/AbstractReactive.sol';
-import 'lib/reactive-lib/src/interfaces/ISubscriptionService.sol';
-import 'lib/reactive-lib/src/interfaces/IReactive.sol';
+import './lib/reactive-lib/src/abstract-base/AbstractReactive.sol';
+import './lib/reactive-lib/src/interfaces/ISubscriptionService.sol';
+import './lib/reactive-lib/src/interfaces/IReactive.sol';
 
 contract RSC_RevealWatcher is AbstractReactive {
     uint256 private constant SEPOLIA_CHAIN_ID = 11155111;
@@ -11,7 +12,7 @@ contract RSC_RevealWatcher is AbstractReactive {
 
     // topic0 хэш события SwapReveal(bytes32,bytes32,bytes32)
     uint256 private constant SWAP_REVEAL = 0xcf2635b4c441ce5b39d1153854964d581f4c7ce76b379d7e283bd88431ca7b2e;
-    address private constant atomic_swap_contract = 0x6311ac6f9d2f2e931fc9e8117fcf820eb1861657;
+    address private constant atomic_swap_contract = 0x6311AC6F9d2f2E931fC9e8117fCF820eb1861657;
 
     event SubscriptionStatus(bool success);
 

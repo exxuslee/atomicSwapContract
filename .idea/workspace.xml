@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="845e1191-0159-47df-8ab1-99176766542f" name="Changes" comment="add Reactive">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/atomicSwap4Reactive.sol" beforeDir="false" afterPath="$PROJECT_DIR$/atomicSwap4Reactive.sol" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,6 +104,7 @@
       <workItem from="1744194475907" duration="4265000" />
       <workItem from="1744199851739" duration="9205000" />
       <workItem from="1744210771858" duration="1390000" />
+      <workItem from="1744212184166" duration="1015000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <option name="closed" value="true" />
