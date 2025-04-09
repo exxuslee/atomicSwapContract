@@ -7,7 +7,7 @@ contract RSC_RevealWatcher is AbstractReactive {
 
     // topic0 хэш события SwapReveal(bytes32,bytes32,bytes32)
     uint256 private constant SWAP_REVEAL = 0x8eeb5c6c938e6f7c75f7341e1bdb1e55a2848917eeb93b9cd6c128ef3142dc33;
-    address private constant atomic_swap_contract = 0x14ffebda167db6adb6f45927188f2247e8508e80;
+    address private constant atomic_swap_contract = 0x6311ac6f9d2f2e931fc9e8117fcf820eb1861657;
 
     event SubscriptionStatus(bool success);
 
