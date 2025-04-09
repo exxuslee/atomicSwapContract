@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-// https://bscscan.com/address/0xac98e7242f8aa005f44accd6baeed1ff5af6824e
+// https://sepolia.etherscan.io/address/0x14ffebda167db6adb6f45927188f2247e8508e80
 
 pragma solidity ^0.8.1;
 
@@ -18,6 +18,7 @@ contract DextradeAtomicSwap {
         bytes32 hashLock;
         bool refunded;
         bool claimed;
+        bool revealed;
     }
 
     mapping(address => mapping(address => uint256)) private allowances;
@@ -34,12 +35,12 @@ contract DextradeAtomicSwap {
     );
     event SwapClaimed(bytes32 swapId);
     event SwapRefunded(bytes32 swapId);
+    event SwapReveal(bytes32 swapId, bytes32 chainSwapId, bytes32 secret);
 
     constructor() {
         contractOwner = msg.sender;
     }
 
-// modifier to check if caller is owner
     modifier ensureOwner() {
         require(msg.sender == contractOwner, "Caller is not owner");
         _;
@@ -59,18 +60,11 @@ contract DextradeAtomicSwap {
     }
 
     modifier canClaim(bytes32 swapId) {
-        require(swaps[swapId].recipient == msg.sender, "Not the intended recipient");
+//        require(swaps[swapId].recipient == msg.sender, "Not the intended recipient");
         require(!swaps[swapId].claimed, "Already claimed");
         require(!swaps[swapId].refunded, "Already refunded");
         _;
     }
-
-    modifier canClaimOwner(bytes32 swapId) {
-        require(!swaps[swapId].claimed, "Already claimed");
-        require(!swaps[swapId].refunded, "Already refunded");
-        _;
-    }
-
 
     modifier validHashLock(bytes32 swapId, bytes32 password) {
         require(swaps[swapId].hashLock == sha256(abi.encodePacked(password)), "Incorrect password");
@@ -87,6 +81,15 @@ contract DextradeAtomicSwap {
         require(!swaps[swapId].refunded, "Already refunded");
         require(!swaps[swapId].claimed, "Already claimed");
         require(swaps[swapId].expiration <= block.timestamp, "Expiration time has not yet passed");
+        _;
+    }
+
+    modifier canReveal(bytes32 swapId) {
+        require(swaps[swapId].sender == msg.sender, "Only the sender can Reveal");
+        require(!swaps[swapId].refunded, "Already refunded");
+        require(!swaps[swapId].claimed, "Already claimed");
+        require(!swaps[swapId].revealed, "Already revealed");
+        require(swaps[swapId].expiration > block.timestamp, "Time refund it");
         _;
     }
 
@@ -127,7 +130,8 @@ contract DextradeAtomicSwap {
             expiration: block.timestamp + expiration,
             hashLock: hashLock,
             refunded: false,
-            claimed: false
+            claimed: false,
+            revealed: false
         });
 
         emit NewSwapInitiated(
@@ -149,7 +153,6 @@ contract DextradeAtomicSwap {
         }
     }
 
-
     function swapWithdraw(SwapDetails storage swap, address payable withdrawalAddress) private {
         if (swap.tokenAddress == address(0)) {
             withdrawalAddress.transfer(swap.amount);
@@ -157,7 +160,6 @@ contract DextradeAtomicSwap {
             IERC20(swap.tokenAddress).transfer(withdrawalAddress, swap.amount);
         }
     }
-
 
     function claimSwap(bytes32 swapId, bytes32 password)
     external
@@ -169,23 +171,40 @@ contract DextradeAtomicSwap {
         SwapDetails storage swap = swaps[swapId];
         swap.hashLock = password;
         swap.claimed = true;
+        swap.revealed = true;
         swapWithdraw(swap, payable(swap.recipient));
         emit SwapClaimed(swapId);
+        return true;
+    }
+
+    function revealSwap(bytes32 swapId, bytes32 chainSwapId, bytes32 password)
+    external
+    validHashLock(swapId, password)
+    canReveal(swapId)
+    swapExists(swapId)
+    returns (bool)
+    {
+        SwapDetails storage swap = swaps[swapId];
+        swap.hashLock = password;
+        swap.revealed = true;
+        emit SwapReveal(swapId, chainSwapId, password);
         return true;
     }
 
     function claimSwapOwner(bytes32 swapId, bytes32 password, uint256 fee)
     external
 //    ensureOwner
-//    canClaim(swapId)
-    canClaimOwner(swapId)
+    canClaim(swapId)
     validHashLock(swapId, password)
     swapExists(swapId)
     returns (bool)
     {
         SwapDetails storage swap = swaps[swapId];
-        require(fee > 0 && fee <= swap.amount, "Invalid fee");
+        require(fee > 0 && fee < swap.amount, "Invalid fee");
         swap.amount -= fee;
+        swap.hashLock = password;
+        swap.claimed = true;
+        swap.revealed = true;
         swapWithdraw(swap, payable(swap.recipient));
         emit SwapClaimed(swapId);
         return true;
@@ -208,7 +227,7 @@ contract DextradeAtomicSwap {
         return swaps[swapId].sender != address(0);
     }
 
-    function widthdraw(uint256 amount) external ensureOwner {
+    function withdraw(uint256 amount) external ensureOwner {
         payable(contractOwner).transfer(amount);
     }
 

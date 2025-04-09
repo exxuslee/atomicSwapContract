@@ -1,240 +1,57 @@
-// SPDX-License-Identifier: GPL-3.0
-// https://sepolia.etherscan.io/address/0x14ffebda167db6adb6f45927188f2247e8508e80
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
 
-pragma solidity ^0.8.1;
+contract RSC_RevealWatcher is AbstractReactive {
+    uint256 private constant SEPOLIA_CHAIN_ID = 11155111;
+    uint64 private constant CALLBACK_GAS_LIMIT = 3000000;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+    // topic0 хэш события SwapReveal(bytes32,bytes32,bytes32)
+    uint256 private constant SWAP_REVEAL = 0x8eeb5c6c938e6f7c75f7341e1bdb1e55a2848917eeb93b9cd6c128ef3142dc33;
+    address private constant atomic_swap_contract = 0x14ffebda167db6adb6f45927188f2247e8508e80;
 
-contract DextradeAtomicSwap {
-    address private contractOwner;
-
-    struct SwapDetails {
-        address recipient;
-        address payable sender;
-        address tokenAddress;
-        uint256 amount;
-        uint256 expiration;
-        bytes32 hashLock;
-        bool refunded;
-        bool claimed;
-        bool revealed;
-    }
-
-    mapping(address => mapping(address => uint256)) private allowances;
-    mapping(bytes32 => SwapDetails) public swaps;
-
-    event NewSwapInitiated(
-        bytes32 swapId,
-        address payable sender,
-        address recipient,
-        address tokenAddress,
-        uint256 amount,
-        bytes32 hashLock,
-        uint256 expiration
-    );
-    event SwapClaimed(bytes32 swapId);
-    event SwapRefunded(bytes32 swapId);
-    event SwapReveal(bytes32 swapId, bytes32 secret);
+    event SubscriptionStatus(bool success);
 
     constructor() {
-        contractOwner = msg.sender;
-    }
-
-    modifier ensureOwner() {
-        require(msg.sender == contractOwner, "Caller is not owner");
-        _;
-    }
-
-    modifier ensureAllowance(address token, address owner, uint256 amount) {
-        require(amount > 0, "Amount must be greater than 0");
-        if (token != address(0)) {
-            require(IERC20(token).allowance(owner, address(this)) >= amount, "Allowance must be greater than 0");
-        }
-        _;
-    }
-
-    modifier ensureFutureExpiration(uint256 time) {
-        require(time > block.timestamp, "Expiration time must be in the future");
-        _;
-    }
-
-    modifier canClaim(bytes32 swapId) {
-//        require(swaps[swapId].recipient == msg.sender, "Not the intended recipient");
-        require(!swaps[swapId].claimed, "Already claimed");
-        require(!swaps[swapId].refunded, "Already refunded");
-        _;
-    }
-
-
-    modifier validHashLock(bytes32 swapId, bytes32 password) {
-        require(swaps[swapId].hashLock == sha256(abi.encodePacked(password)), "Incorrect password");
-        _;
-    }
-
-    modifier swapExists(bytes32 swapId) {
-        require(swapPresent(swapId), "Swap does not exist");
-        _;
-    }
-
-    modifier canRefund(bytes32 swapId) {
-        require(swaps[swapId].sender == msg.sender, "Only the sender can refund");
-        require(!swaps[swapId].refunded, "Already refunded");
-        require(!swaps[swapId].claimed, "Already claimed");
-        require(swaps[swapId].expiration <= block.timestamp, "Expiration time has not yet passed");
-        _;
-    }
-
-    modifier canReveal(bytes32 swapId) {
-        require(swaps[swapId].sender == msg.sender, "Only the sender can Reveal");
-        require(!swaps[swapId].refunded, "Already refunded");
-        require(!swaps[swapId].claimed, "Already claimed");
-        require(!swaps[swapId].revealed, "Already revealed");
-        require(swaps[swapId].expiration > block.timestamp, "Time refund it");
-        _;
-    }
-
-    function initiateNewSwap(
-        address recipient,
-        bytes32 hashLock,
-        uint256 expiration,
-        address tokenAddress,
-        uint256 amount
-    )
-    external
-    payable
-    ensureAllowance(tokenAddress, msg.sender, amount)
-    returns (bytes32 swapId)
-    {
-        swapId = sha256(
-            abi.encodePacked(
-                msg.sender,
-                recipient,
-                tokenAddress,
-                amount,
-                hashLock,
-                expiration
-            )
-        );
-
-        if (swapPresent(swapId)) {
-            revert("Swap already exists");
-        }
-
-        reserve(amount, tokenAddress);
-
-        swaps[swapId] = SwapDetails({
-            recipient: recipient,
-            sender: payable(msg.sender),
-            tokenAddress: tokenAddress,
-            amount: amount,
-            expiration: block.timestamp + expiration,
-            hashLock: hashLock,
-            refunded: false,
-            claimed: false,
-            revealed: false
-        });
-
-        emit NewSwapInitiated(
-            swapId,
-            payable(msg.sender),
-            recipient,
-            tokenAddress,
-            amount,
-            hashLock,
-            expiration
-        );
-    }
-
-    function reserve(uint256 amount, address tokenAddress) private {
-        if (tokenAddress == address(0)) {
-            require(amount == msg.value, "Amount must match with value");
-        } else {
-            require(IERC20(tokenAddress).transferFrom(msg.sender, address(this), amount), "Transfer failed");
+        if (!vm) {
+            try service.subscribe(
+                SEPOLIA_CHAIN_ID,
+                atomic_swap_contract,
+                SWAP_REVEAL,
+                REACTIVE_IGNORE,
+                REACTIVE_IGNORE,
+                REACTIVE_IGNORE
+            ) {
+                emit SubscriptionStatus(true);
+            } catch {
+                emit SubscriptionStatus(false);
+            }
         }
     }
 
-
-    function swapWithdraw(SwapDetails storage swap, address payable withdrawalAddress) private {
-        if (swap.tokenAddress == address(0)) {
-            withdrawalAddress.transfer(swap.amount);
-        } else {
-            IERC20(swap.tokenAddress).transfer(withdrawalAddress, swap.amount);
+    function react(LogRecord calldata log) external override vmOnly {
+        if (log.topic_0 == SWAP_REVEAL) {
+            bytes memory payload_callback1 = abi.encodeWithSignature(
+                "claimSwap(bytes32,bytes32)",
+                log.topic_1,  // swapId
+                log.topic_3   // secret
+            );
+            emit Callback(
+                SEPOLIA_CHAIN_ID,
+                atomic_swap_contract,
+                CALLBACK_GAS_LIMIT,
+                payload_callback1
+            );
+            bytes memory payload_callback2 = abi.encodeWithSignature(
+                "claimSwap(bytes32,bytes32)",
+                log.topic_2,  // chainSwapId
+                log.topic_3   // secret
+            );
+            emit Callback(
+                SEPOLIA_CHAIN_ID,
+                atomic_swap_contract,
+                CALLBACK_GAS_LIMIT,
+                payload_callback2
+            );
         }
-    }
-
-
-    function claimSwap(bytes32 swapId, bytes32 password)
-    external
-    canClaim(swapId)
-    validHashLock(swapId, password)
-    swapExists(swapId)
-    returns (bool)
-    {
-        SwapDetails storage swap = swaps[swapId];
-        swap.hashLock = password;
-        swap.claimed = true;
-        swap.revealed = true;
-        swapWithdraw(swap, payable(swap.recipient));
-        emit SwapClaimed(swapId);
-        return true;
-    }
-
-    function revealSwap(bytes32 swapId, bytes32 password)
-    external
-    validHashLock(swapId, password)
-    canReveal(swapId)
-    swapExists(swapId)
-    returns (bool)
-    {
-        SwapDetails storage swap = swaps[swapId];
-        swap.hashLock = password;
-        swap.revealed = true;
-        emit SwapReveal(swapId, password);
-        return true;
-    }
-
-    function claimSwapOwner(bytes32 swapId, bytes32 password, uint256 fee)
-    external
-//    ensureOwner
-    canClaim(swapId)
-    validHashLock(swapId, password)
-    swapExists(swapId)
-    returns (bool)
-    {
-        SwapDetails storage swap = swaps[swapId];
-        require(fee > 0 && fee < swap.amount, "Invalid fee");
-        swap.amount -= fee;
-        swap.hashLock = password;
-        swap.claimed = true;
-        swap.revealed = true;
-        swapWithdraw(swap, payable(swap.recipient));
-        emit SwapClaimed(swapId);
-        return true;
-    }
-
-    function refundSwap(bytes32 swapId)
-    external
-    swapExists(swapId)
-    canRefund(swapId)
-    returns (bool)
-    {
-        SwapDetails storage swap = swaps[swapId];
-        swap.refunded = true;
-        swapWithdraw(swap, swap.sender);
-        emit SwapRefunded(swapId);
-        return true;
-    }
-
-    function swapPresent(bytes32 swapId) internal view returns (bool) {
-        return swaps[swapId].sender != address(0);
-    }
-
-    function withdraw(uint256 amount) external ensureOwner {
-        payable(contractOwner).transfer(amount);
-    }
-
-    function withdrawToken(address tokenContract, uint256 amount) external ensureOwner {
-        IERC20(tokenContract).transfer(msg.sender, amount);
     }
 }
