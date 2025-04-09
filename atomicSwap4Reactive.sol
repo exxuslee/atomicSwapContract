@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import 'lib/reactive-lib/src/abstract-base/AbstractReactive.sol';
+import 'lib/reactive-lib/src/interfaces/ISubscriptionService.sol';
+import 'lib/reactive-lib/src/interfaces/IReactive.sol';
+
 contract RSC_RevealWatcher is AbstractReactive {
     uint256 private constant SEPOLIA_CHAIN_ID = 11155111;
     uint64 private constant CALLBACK_GAS_LIMIT = 3000000;
