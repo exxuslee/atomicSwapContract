@@ -9,8 +9,8 @@ import 'lib/reactive-lib/src/interfaces/IReactive.sol';
 contract RSC_RevealWatcher is AbstractReactive {
     uint64 private constant CALLBACK_GAS_LIMIT = 3000000;
 
-    // topic0 хэш события SwapReveal(bytes32,bytes32,bytes32)
-    uint256 private constant SWAP_REVEAL = 0xcf2635b4c441ce5b39d1153854964d581f4c7ce76b379d7e283bd88431ca7b2e;
+    // topic0 хэш события "SwapReveal(bytes32,uint256,address,bytes32,bytes32)"
+    uint256 private constant SWAP_REVEAL = 0xdf62986a4c8d8da04625b7d3e3043285e8a4014d751a98d0b7748b5ae41ab345;
     address private constant atomic_swap_contract = 0x6311AC6F9d2f2E931fC9e8117fCF820eb1861657;
 
     event SubscriptionStatus(bool success);
