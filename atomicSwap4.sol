@@ -5,8 +5,9 @@ pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import 'lib/reactive-lib/src/abstract-base/AbstractCallback.sol';
 
-contract DextradeAtomicSwap {
+contract DextradeAtomicSwap is AbstractCallback {
     address private contractOwner;
 
     struct SwapDetails {
@@ -35,7 +36,7 @@ contract DextradeAtomicSwap {
     );
     event SwapClaimed(bytes32 swapId);
     event SwapRefunded(bytes32 swapId);
-    event SwapReveal(bytes32 swapId, bytes32 chainSwapId, bytes32 secret);
+    event SwapReveal(bytes32 swapId, uint256 chainId, address chainContract, bytes32 chainSwapId, bytes32 secret);
 
     constructor() {
         contractOwner = msg.sender;
@@ -161,7 +162,7 @@ contract DextradeAtomicSwap {
         }
     }
 
-    function claimSwap(bytes32 swapId, bytes32 password)
+    function claimSwap(address /*spender*/, bytes32 swapId, bytes32 password)
     external
     canClaim(swapId)
     validHashLock(swapId, password)
@@ -177,7 +178,7 @@ contract DextradeAtomicSwap {
         return true;
     }
 
-    function revealSwap(bytes32 swapId, bytes32 chainSwapId, bytes32 password)
+    function revealSwap(bytes32 swapId, uint256 chainId, address chainContract, bytes32 chainSwapId, bytes32 password)
     external
     validHashLock(swapId, password)
     canReveal(swapId)
@@ -187,7 +188,7 @@ contract DextradeAtomicSwap {
         SwapDetails storage swap = swaps[swapId];
         swap.hashLock = password;
         swap.revealed = true;
-        emit SwapReveal(swapId, chainSwapId, password);
+        emit SwapReveal(swapId, chainId, chainContract, chainSwapId, password);
         return true;
     }
 

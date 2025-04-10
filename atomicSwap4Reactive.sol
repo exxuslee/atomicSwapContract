@@ -2,8 +2,11 @@
 //  https://kopli.reactscan.net/address/0x6f1c4b2bd0489e32af741c405cca696e8a95ce9c/contract/0xa19f4f9459f643520aa92fcfc3cd35f193f311dc
 pragma solidity ^0.8.20;
 
+import 'lib/reactive-lib/src/abstract-base/AbstractReactive.sol';
+import 'lib/reactive-lib/src/interfaces/ISubscriptionService.sol';
+import 'lib/reactive-lib/src/interfaces/IReactive.sol';
+
 contract RSC_RevealWatcher is AbstractReactive {
-    uint256 private constant SEPOLIA_CHAIN_ID = 11155111;
     uint64 private constant CALLBACK_GAS_LIMIT = 3000000;
 
     // topic0 хэш события SwapReveal(bytes32,bytes32,bytes32)
@@ -31,17 +34,20 @@ contract RSC_RevealWatcher is AbstractReactive {
 
     function react(LogRecord calldata log) external override vmOnly {
         if (log.topic_0 == SWAP_REVEAL) {
-            (bytes32 swapId, bytes32 chainSwapId, bytes32 secret) = abi.decode(log.data, (bytes32, bytes32, bytes32));
-            bytes memory payload_callback1 = abi.encodeWithSignature("claimSwap(bytes32,bytes32)", swapId, secret);
+            (bytes32 swapId, uint256 chainId, bytes32 chainSwapId, bytes32 secret) = abi.decode(
+                log.data, (bytes32, uint256, bytes32, bytes32));
+            bytes memory payload_callback1 = abi.encodeWithSignature("claimSwap(address,bytes32,bytes32)",
+                address(0), swapId, secret);
             emit Callback(
-                SEPOLIA_CHAIN_ID,
+                log.chain_id,
                 atomic_swap_contract,
                 CALLBACK_GAS_LIMIT,
                 payload_callback1
             );
-            bytes memory payload_callback2 = abi.encodeWithSignature("claimSwap(bytes32,bytes32)", chainSwapId, secret);
+            bytes memory payload_callback2 = abi.encodeWithSignature("claimSwap(address,bytes32,bytes32)",
+                address(0), chainSwapId, secret);
             emit Callback(
-                SEPOLIA_CHAIN_ID,
+                chainId,
                 atomic_swap_contract,
                 CALLBACK_GAS_LIMIT,
                 payload_callback2
