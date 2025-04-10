@@ -34,8 +34,8 @@ contract RSC_RevealWatcher is AbstractReactive {
 
     function react(LogRecord calldata log) external override vmOnly {
         if (log.topic_0 == SWAP_REVEAL) {
-            (bytes32 swapId, uint256 chainId, bytes32 chainSwapId, bytes32 secret) = abi.decode(
-                log.data, (bytes32, uint256, bytes32, bytes32));
+            (bytes32 swapId, uint256 chainId, address chainContractAddress, bytes32 chainSwapId, bytes32 secret) = abi.decode(
+                log.data, (bytes32, uint256, address, bytes32, bytes32));
             bytes memory payload_callback1 = abi.encodeWithSignature("claimSwap(address,bytes32,bytes32)",
                 address(0), swapId, secret);
             emit Callback(
@@ -48,7 +48,7 @@ contract RSC_RevealWatcher is AbstractReactive {
                 address(0), chainSwapId, secret);
             emit Callback(
                 chainId,
-                atomic_swap_contract,
+                chainContractAddress,
                 CALLBACK_GAS_LIMIT,
                 payload_callback2
             );

@@ -36,7 +36,7 @@ contract DextradeAtomicSwap is AbstractCallback {
     );
     event SwapClaimed(bytes32 swapId);
     event SwapRefunded(bytes32 swapId);
-    event SwapReveal(bytes32 swapId, uint256 chainId, address chainContract, bytes32 chainSwapId, bytes32 secret);
+    event SwapReveal(bytes32 swapId, uint256 chainId, address chainContractAddress, bytes32 chainSwapId, bytes32 secret);
 
     constructor() {
         contractOwner = msg.sender;
