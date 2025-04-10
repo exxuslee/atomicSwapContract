@@ -45,7 +45,7 @@ contract RSC_RevealWatcher is AbstractReactive {
             );
             bytes memory payload_callback2 = abi.encodeWithSignature(
                 "claimSwap(bytes32,bytes32)",
-                log.chainSwapId,
+                chainSwapId,
                 secret
             );
             emit Callback(

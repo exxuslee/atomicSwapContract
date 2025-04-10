@@ -1,5 +1,6 @@
 # Logs
 logs
+lib
 *.log
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
