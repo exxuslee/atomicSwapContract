@@ -42,10 +42,6 @@ contract DextradeAtomicSwap is AbstractCallback {
     event SwapRefunded(bytes32 swapId);
     event SwapReveal(bytes32 swapId, uint256 chainId, address chainContractAddress, bytes32 chainSwapId, bytes32 secret);
 
-    constructor() {
-        contractOwner = msg.sender;
-    }
-
     modifier ensureOwner() {
         require(msg.sender == contractOwner, "Caller is not owner");
         _;
