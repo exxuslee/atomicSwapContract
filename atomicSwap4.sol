@@ -190,7 +190,6 @@ contract DextradeAtomicSwap is AbstractCallback {
     returns (bool)
     {
         SwapDetails storage swap = swaps[swapId];
-        swap.hashLock = password;
         swap.revealed = true;
         emit SwapReveal(swapId, chainId, chainContract, chainSwapId, password);
         return true;
