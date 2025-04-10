@@ -5,7 +5,7 @@ pragma solidity ^0.8.1;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import 'lib/reactive-lib/src/abstract-base/AbstractCallback.sol';
+import './lib/reactive-lib/src/abstract-base/AbstractCallback.sol';
 
 contract DextradeAtomicSwap is AbstractCallback {
     address private contractOwner;
