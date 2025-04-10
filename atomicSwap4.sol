@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0
-// https://sepolia.etherscan.io/address/0x6311ac6f9d2f2e931fc9e8117fcf820eb1861657
+// https://sepolia.etherscan.io/address/0x8F26dEa444261912E139b2CfDf5A80C9429C436c
 
 pragma solidity ^0.8.1;
 
@@ -9,6 +9,8 @@ import './lib/reactive-lib/src/abstract-base/AbstractCallback.sol';
 
 contract DextradeAtomicSwap is AbstractCallback {
     address private contractOwner;
+
+    constructor(address callback) AbstractCallback(callback) payable {}
 
     struct SwapDetails {
         address recipient;
