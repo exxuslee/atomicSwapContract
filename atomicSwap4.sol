@@ -10,7 +10,9 @@ import './lib/reactive-lib/src/abstract-base/AbstractCallback.sol';
 contract DextradeAtomicSwap is AbstractCallback {
     address private contractOwner;
 
-    constructor(address callback) AbstractCallback(callback) payable {}
+    constructor(address callback) AbstractCallback(callback) payable {
+        contractOwner = msg.sender;
+    }
 
     struct SwapDetails {
         address recipient;
